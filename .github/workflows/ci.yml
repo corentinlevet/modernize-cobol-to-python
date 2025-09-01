@@ -21,7 +21,7 @@ jobs:
         run: |
           set -o pipefail
           echo "Running pytest inside Docker image and saving output to pytest-output.txt"
-          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 --junitxml=pytest-report.xml code/python/tests" > pytest-output.txt 2>&1 || true
+          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 --junitxml=pytest-report.xml --cov=code/python/src --cov-report=xml:coverage.xml code/python/tests" > pytest-output.txt 2>&1 || true
           rc=$?
           echo $rc > pytest-exit-code.txt
 
@@ -34,6 +34,7 @@ jobs:
             pytest-output.txt
             pytest-exit-code.txt
             pytest-report.xml
+            coverage.xml
 
       - name: Fail job if tests failed (prints logs)
         if: always()
@@ -48,4 +49,11 @@ jobs:
 
       - name: Show built image info
         run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"
+
+      - name: Upload coverage to Coveralls
+        if: always()
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.xml
 

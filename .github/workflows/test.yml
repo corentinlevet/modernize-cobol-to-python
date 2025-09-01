@@ -1,0 +1,67 @@
+name: CI - Run tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image from GHCR
+        run: |
+          set -e
+          docker pull ghcr.io/${{ github.repository_owner }}/modernize-cobol-to-python:latest
+          docker tag ghcr.io/${{ github.repository_owner }}/modernize-cobol-to-python:latest cobol-python-ci:latest
+
+      - name: Run tests inside Docker and capture output
+        run: |
+          set -o pipefail
+          echo "Running pytest inside Docker image and saving output to pytest-output.txt"
+          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 --junitxml=pytest-report.xml --cov=code/python/src --cov-report=xml:coverage.xml code/python/tests" > pytest-output.txt 2>&1 || true
+          rc=$?
+          echo $rc > pytest-exit-code.txt
+
+      - name: Upload test logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-output
+          path: |
+            pytest-output.txt
+            pytest-exit-code.txt
+            pytest-report.xml
+            coverage.xml
+
+      - name: Fail job if tests failed (prints logs)
+        if: always()
+        run: |
+          rc=$(cat pytest-exit-code.txt || echo 1)
+          echo "pytest exit code: $rc"
+          if [ "$rc" -ne 0 ]; then
+            echo "Tests failed — printing pytest-output.txt"
+            cat pytest-output.txt || true
+            exit $rc
+          fi
+
+      - name: Show built image info
+        run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"
+
+      - name: Upload coverage to Coveralls
+        if: always()
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.xml

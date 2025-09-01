@@ -1,7 +1,7 @@
 # modernize-cobol-to-python
 
-[![CI](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml/badge.svg)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml)
-[![Tests](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml/badge.svg?event=push&label=tests)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml)
+[![Build](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/build.yml/badge.svg)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/build.yml)
+[![Tests](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/test.yml/badge.svg?event=push&label=tests)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/test.yml)
 [![Coverage](https://coveralls.io/repos/github/corentinlevet/modernize-cobol-to-python/badge.svg?branch=main)](https://coveralls.io/github/corentinlevet/modernize-cobol-to-python?branch=main)
 [![Last commit](https://img.shields.io/github/last-commit/corentinlevet/modernize-cobol-to-python)](https://github.com/corentinlevet/modernize-cobol-to-python/commits/main)
 

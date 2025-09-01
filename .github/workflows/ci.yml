@@ -17,9 +17,26 @@ jobs:
         run: |
           docker build -f docker/Dockerfile -t cobol-python-ci:latest .
 
-      - name: Run tests inside Docker
+      - name: Run tests inside Docker and capture output
         run: |
-          docker run --rm cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests"
+          set -o pipefail
+          echo "Running pytest inside Docker image and saving output to pytest-output.txt"
+          docker run --rm cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests" > pytest-output.txt 2>&1
+          rc=$?
+          echo $rc > pytest-exit-code.txt
+          if [ $rc -ne 0 ]; then
+            echo "Tests failed with exit code $rc"
+            cat pytest-output.txt
+            exit $rc
+          fi
+
+      - name: Upload test logs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-output
+          path: |
+            pytest-output.txt
+            pytest-exit-code.txt
 
       - name: Show built image info
         run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"

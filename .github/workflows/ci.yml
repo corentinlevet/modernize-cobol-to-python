@@ -21,7 +21,7 @@ jobs:
         run: |
           set -o pipefail
           echo "Running pytest inside Docker image and saving output to pytest-output.txt"
-          docker run --rm cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests" > pytest-output.txt 2>&1 || true
+          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests" > pytest-output.txt 2>&1 || true
           rc=$?
           echo $rc > pytest-exit-code.txt
 

@@ -1,0 +1,25 @@
+name: CI - Build Docker and run tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -f docker/Dockerfile -t cobol-python-ci:latest .
+
+      - name: Run tests inside Docker
+        run: |
+          docker run --rm cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests"
+
+      - name: Show built image info
+        run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"

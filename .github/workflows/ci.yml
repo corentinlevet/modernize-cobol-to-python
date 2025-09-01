@@ -49,11 +49,3 @@ jobs:
       - name: Show built image info
         run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"
 
-      - name: Publish JUnit test report to GitHub
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: pytest
-          path: pytest-report.xml
-          reporter: github
-          fail-on-error: false

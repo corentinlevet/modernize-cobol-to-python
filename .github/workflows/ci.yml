@@ -21,7 +21,7 @@ jobs:
         run: |
           set -o pipefail
           echo "Running pytest inside Docker image and saving output to pytest-output.txt"
-          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 code/python/tests" > pytest-output.txt 2>&1 || true
+          docker run --rm -v "${{ github.workspace }}":/app cobol-python-ci:latest bash -lc "cd /app && pytest -q --disable-warnings --maxfail=1 --junitxml=pytest-report.xml code/python/tests" > pytest-output.txt 2>&1 || true
           rc=$?
           echo $rc > pytest-exit-code.txt
 
@@ -33,6 +33,7 @@ jobs:
           path: |
             pytest-output.txt
             pytest-exit-code.txt
+            pytest-report.xml
 
       - name: Fail job if tests failed (prints logs)
         if: always()
@@ -47,3 +48,12 @@ jobs:
 
       - name: Show built image info
         run: docker images cobol-python-ci:latest --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"
+
+      - name: Publish JUnit test report to GitHub
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: pytest
+          path: pytest-report.xml
+          reporter: junit
+          fail-on-error: false

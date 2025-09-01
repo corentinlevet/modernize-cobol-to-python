@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml/badge.svg)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml)
 [![Tests](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml/badge.svg?event=push&label=tests)](https://github.com/corentinlevet/modernize-cobol-to-python/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/corentinlevet/modernize-cobol-to-python)](https://github.com/corentinlevet/modernize-cobol-to-python/releases)
 [![Last commit](https://img.shields.io/github/last-commit/corentinlevet/modernize-cobol-to-python)](https://github.com/corentinlevet/modernize-cobol-to-python/commits/main)
 
 This repository contains a small COBOL -> Python modernization project and a CI workflow that builds a Docker image and runs the Python test-suite.

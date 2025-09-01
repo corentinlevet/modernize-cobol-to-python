@@ -1,0 +1,17 @@
+FROM fedora:latest
+
+RUN dnf -y update && \
+    dnf -y install \
+        git \
+        make \
+        gcc \
+        gnucobol \
+        python3 \
+        python3-pip \
+        vim \
+        less \
+        && dnf clean all
+
+WORKDIR /app
+
+CMD ["/bin/bash"]

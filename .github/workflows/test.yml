@@ -5,9 +5,22 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # Also run this workflow when the build workflow finishes. This ensures tests
+  # run after the image build completes (for example when build pushes an
+  # image to GHCR). The job further guards so it only continues when the
+  # build concluded successfully.
+  workflow_run:
+    workflows:
+      - "CI - Build Docker image"
+    types:
+      - completed
 
 jobs:
   run-tests:
+    # Only proceed automatically when triggered by the build workflow if that
+    # build finished successfully. If this job is triggered by a push or PR
+    # event it will continue as before.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -1,5 +1,13 @@
 name: CI - Build Docker image
 
+# Grant minimal permissions required to push to GHCR. If your organization
+# disallows creation of organization packages via the GITHUB_TOKEN, create a
+# personal access token (PAT) with `write:packages` (and `repo` if needed) and
+# add it to this repository's secrets as `GHCR_PAT`.
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: [ main ]
@@ -24,7 +32,10 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # Prefer a user PAT stored in GHCR_PAT (recommended for org repos).
+          # Fall back to the automatically provided GITHUB_TOKEN when that
+          # is permitted by the organization.
+          password: ${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image to GHCR
         uses: docker/build-push-action@v4
